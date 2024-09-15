@@ -18,5 +18,10 @@ def getMainWindow() -> tk.Tk:
     return mainWindow
 
 def runMainWindow():
-    window = getMainWindow()
-    window.mainloop()
+    ventana_principal = getMainWindow()
+    ventana_principal.configure(background="blue")
+    ventana_principal.attributes("-alpha", 0.7)
+    ventana_principal.title("MUNDO-SALUD")
+    ventana_principal.minsize(1200, 800)
+
+    ventana_principal.mainloop()
