@@ -9,7 +9,7 @@ def salir(window: tk.Misc) -> None:
 
 def setCloseButton(window: tk.Misc):
     closeButton = getButton(window, "Salir", lambda: salir(window))
-    closeButton.grid(row=2, column=1, padx=0, pady=5)
+    closeButton.grid(row=1, column=1, padx=5, pady=5, sticky="nw")
 
 def getButton(window: tk.Misc, text: str, onClick: Callable[[], None], icon_path: str = None) -> tk.Button:
     # Crear el botón
@@ -41,41 +41,3 @@ def getButton(window: tk.Misc, text: str, onClick: Callable[[], None], icon_path
     boton.bind("<Leave>", on_leave)
     
     return boton
-
-def getMainWindow() -> tk.Tk:
-    mainWindow = tk.Tk()
-    setCloseButton(mainWindow)
-    return mainWindow
-
-def getFrame(window: tk.Misc, row: int, column: int) -> tk.Frame:
-    frame = tk.Frame(window)
-    frame.grid(row=row, column=column, padx=2)
-    return frame
-
-def getListBox(window: tk.Misc, frame_row: int, frame_column: int) -> tk.Listbox:
-    frame = getFrame(window, frame_row, frame_column)
-    listbox = tk.Listbox(frame, height=10, width=50)
-    listbox.grid(row=0, column=1)
-    return listbox
-
-def display_excel_data(window: tk.Misc, file_path: str) -> None:
-    frame = getFrame(window, row=8, column=2)
-    
-    # Leer el archivo Excel
-    df = pd.read_excel(file_path)
-    
-    # Crear el Treeview
-    tree = ttk.Treeview(frame)
-    tree.grid(row=0, column=0)
-    
-    # Configurar columnas
-    tree["columns"] = list(df.columns)
-    tree["show"] = "headings"
-    
-    for col in df.columns:
-        tree.heading(col, text=col)
-        tree.column(col, width=100)
-    
-    # Insertar filas
-    for _, row in df.iterrows():
-        tree.insert("", "end", values=list(row))
