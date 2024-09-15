@@ -7,14 +7,7 @@ def salir(window: tk.Misc) -> None:
 
 def setCloseButton(window: tk.Misc):
     closeButton = getButton(window, "Salir", lambda: salir(window))
-    closeButton.grid(row=2, column=1, padx=5, pady=5, sticky=tk.NE)
-
-def setFullScreen(window: tk.Tk):
-    # Obtener el tamaño de la pantalla
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-    # Configurar el tamaño de la ventana para que ocupe toda la pantalla
-    window.geometry(f"{screen_width}x{screen_height}+0+0")
+    closeButton.grid(row=2, column=1, padx=0, pady=5)
 
 def getButton(window: tk.Misc, text: str, onClick: Callable[[], None], icon_path: str = None) -> tk.Button:
     # Crear el botón
@@ -54,11 +47,11 @@ def getMainWindow() -> tk.Tk:
 
 def getFrame(window: tk.Misc, row: int, column: int) -> tk.Frame:
     frame = tk.Frame(window)
-    frame.grid(row=row, column=column, sticky=(tk.W, tk.E, tk.N, tk.S))
+    frame.grid(row=row, column=column, padx=2)
     return frame
 
 def getListBox(window: tk.Misc, frame_row: int, frame_column: int) -> tk.Listbox:
     frame = getFrame(window, frame_row, frame_column)
     listbox = tk.Listbox(frame, height=10, width=50)
-    listbox.grid(row=100, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+    listbox.grid(row=0, column=1)
     return listbox
