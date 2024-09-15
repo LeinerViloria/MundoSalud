@@ -1,6 +1,8 @@
 import tkinter as tk
+from tkinter import ttk
 from typing import Callable
 from PIL import Image, ImageTk
+import pandas as pd
 
 def salir(window: tk.Misc) -> None:
     window.destroy()
@@ -55,3 +57,25 @@ def getListBox(window: tk.Misc, frame_row: int, frame_column: int) -> tk.Listbox
     listbox = tk.Listbox(frame, height=10, width=50)
     listbox.grid(row=0, column=1)
     return listbox
+
+def display_excel_data(window: tk.Misc, file_path: str) -> None:
+    frame = getFrame(window, row=8, column=2)
+    
+    # Leer el archivo Excel
+    df = pd.read_excel(file_path)
+    
+    # Crear el Treeview
+    tree = ttk.Treeview(frame)
+    tree.grid(row=0, column=0)
+    
+    # Configurar columnas
+    tree["columns"] = list(df.columns)
+    tree["show"] = "headings"
+    
+    for col in df.columns:
+        tree.heading(col, text=col)
+        tree.column(col, width=100)
+    
+    # Insertar filas
+    for _, row in df.iterrows():
+        tree.insert("", "end", values=list(row))
