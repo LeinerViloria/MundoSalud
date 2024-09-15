@@ -7,7 +7,7 @@ def salir(window: tk.Misc) -> None:
 
 def setCloseButton(window: tk.Misc):
     closeButton = getButton(window, "Salir", lambda: salir(window))
-    closeButton.grid(row=2, column=1, padx=5, pady=5)
+    closeButton.grid(row=2, column=1, padx=5, pady=5, sticky=tk.NE)
 
 def setFullScreen(window: tk.Tk):
     # Obtener el tamaño de la pantalla
@@ -52,13 +52,13 @@ def getMainWindow() -> tk.Tk:
     setCloseButton(mainWindow)
     return mainWindow
 
-def runMainWindow():
-    ventana_principal = getMainWindow()
-    ventana_principal.configure(background="light blue")
-    ventana_principal.attributes("-alpha", 1)
-    ventana_principal.title("MUNDO-SALUD")
-    ventana_principal.iconbitmap('img/medical.ico')
+def getFrame(window: tk.Misc, row: int, column: int) -> tk.Frame:
+    frame = tk.Frame(window)
+    frame.grid(row=row, column=column, sticky=(tk.W, tk.E, tk.N, tk.S))
+    return frame
 
-    setFullScreen(ventana_principal)
-
-    ventana_principal.mainloop()
+def getListBox(window: tk.Misc, frame_row: int, frame_column: int) -> tk.Listbox:
+    frame = getFrame(window, frame_row, frame_column)
+    listbox = tk.Listbox(frame, height=10, width=50)
+    listbox.grid(row=100, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+    return listbox
