@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter.ttk import Treeview
-import numpy as np
 from sklearn.linear_model import LinearRegression
 import pandas as pd
+from sklearn.model_selection import train_test_split
 import TKinter_Manager as Tk_Manager
 import path_manager as pm
 
@@ -98,15 +98,17 @@ def predict_waiting_time(patients: str, df: pd.DataFrame) -> None:
         num_patients = int(patients)
         
         # Preparar datos para el modelo
-        X = df[[patients_treated_label]].values
+        x = df[[patients_treated_label]].values
         y = df[waiting_time_label].values
+
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2,  random_state=40)
         
         # Entrenar el modelo de regresión lineal
         model = LinearRegression()
-        model.fit(X, y)
+        model.fit(x_train, y_train)
         
         # Predecir el tiempo de espera
-        predicted_waiting_time = model.predict(np.array([[num_patients]]))[0]
+        predicted_waiting_time = model.predict(x_test)
         
         # Mostrar el resultado
         prediction_result_label.config(text=f"Tiempo de Espera Predicho: {predicted_waiting_time:.2f} minutos")
