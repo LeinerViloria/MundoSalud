@@ -75,7 +75,7 @@ def display_excel_data(window: tk.Misc, file_path: str) -> None:
 
 def add_prediction_section(window: tk.Misc, df: pd.DataFrame) -> None:
     frame = tk.Frame(window)
-    frame.grid(row=8, column=3, padx=10, pady=10)
+    frame.grid(row=12, column=1, padx=1, pady=5)
 
     # Etiqueta para la entrada
     tk.Label(frame, text="Número de Pacientes:").grid(row=0, column=0, padx=5, pady=5)
