@@ -1,8 +1,6 @@
 import tkinter as tk
-from tkinter import ttk
 from typing import Callable
 from PIL import Image, ImageTk
-import pandas as pd
 
 def salir(window: tk.Misc) -> None:
     window.destroy()

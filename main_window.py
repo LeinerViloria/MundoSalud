@@ -1,6 +1,8 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter.ttk import Treeview
-
+import numpy as np
+from sklearn.linear_model import LinearRegression
 import pandas as pd
 import TKinter_Manager as Tk_Manager
 import path_manager as pm
@@ -63,3 +65,47 @@ def display_excel_data(window: tk.Misc, file_path: str) -> None:
     # Insertar filas
     for _, row in df.iterrows():
         tree.insert("", "end", values=list(row))
+
+    # Añadir área para la predicción
+    add_prediction_section(window, df)
+
+def add_prediction_section(window: tk.Misc, df: pd.DataFrame) -> None:
+    frame = tk.Frame(window)
+    frame.grid(row=8, column=3, padx=10, pady=10)
+
+    # Etiqueta para la entrada
+    tk.Label(frame, text="Número de Pacientes:").grid(row=0, column=0, padx=5, pady=5)
+
+    # Entrada para número de pacientes
+    entry = tk.Entry(frame)
+    entry.grid(row=0, column=1, padx=5, pady=5)
+
+    # Botón para realizar la predicción
+    predict_button = tk.Button(frame, text="Predecir Tiempo de Espera", command=lambda: predict_waiting_time(entry.get(), df))
+    predict_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+
+    # Etiqueta para mostrar el resultado de la predicción
+    global prediction_result_label
+    prediction_result_label = tk.Label(frame, text="")
+    prediction_result_label.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+
+def predict_waiting_time(patients: str, df: pd.DataFrame) -> None:
+    try:
+        num_patients = int(patients)
+        
+        # Preparar datos para el modelo
+        X = df[['Pacientes Atendidos']].values
+        y = df['Tiempo de Espera (min)'].values
+        
+        # Entrenar el modelo de regresión lineal
+        model = LinearRegression()
+        model.fit(X, y)
+        
+        # Predecir el tiempo de espera
+        predicted_waiting_time = model.predict(np.array([[num_patients]]))[0]
+        
+        # Mostrar el resultado
+        prediction_result_label.config(text=f"Tiempo de Espera Predicho: {predicted_waiting_time:.2f} minutos")
+    
+    except ValueError:
+        messagebox.showerror("Error", "Por favor, ingrese un número válido.")
