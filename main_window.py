@@ -7,6 +7,10 @@ import pandas as pd
 import TKinter_Manager as Tk_Manager
 import path_manager as pm
 
+day_column = 'Dia'
+patients_treated_label = 'Pacientes atendidos'
+waiting_time_label = 'Tiempo de espera (min)'
+
 def runMainWindow():
     # VENTANA PRINCIPAL
     ventana_principal = tk.Tk()
@@ -94,8 +98,8 @@ def predict_waiting_time(patients: str, df: pd.DataFrame) -> None:
         num_patients = int(patients)
         
         # Preparar datos para el modelo
-        X = df[['Pacientes Atendidos']].values
-        y = df['Tiempo de Espera (min)'].values
+        X = df[[patients_treated_label]].values
+        y = df[waiting_time_label].values
         
         # Entrenar el modelo de regresión lineal
         model = LinearRegression()
