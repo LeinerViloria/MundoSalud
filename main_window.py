@@ -94,6 +94,41 @@ def add_prediction_section(window: tk.Misc, df: pd.DataFrame) -> None:
     prediction_result_label = tk.Label(frame, text="")
     prediction_result_label.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
+    ###
+
+    satisfaction_frame = tk.Frame(window)
+    satisfaction_frame.grid(row=12, column=2, padx=1, pady=5)
+
+    # Etiqueta para la entrada
+    tk.Label(satisfaction_frame, text="Tiempo de espera:").grid(row=0, column=0, padx=5, pady=5)
+
+    # Entrada para número de pacientes
+    entry1 = tk.Entry(satisfaction_frame)
+    entry1.grid(row=0, column=1, padx=5, pady=5)
+
+    # Etiqueta para la entrada
+    tk.Label(satisfaction_frame, text="Duracion de la consulta (min):").grid(row=1, column=0, padx=5, pady=5)
+
+    # Entrada para número de pacientes
+    entry2 = tk.Entry(satisfaction_frame)
+    entry2.grid(row=1, column=1, padx=5, pady=5)
+
+    # Etiqueta para la entrada
+    tk.Label(satisfaction_frame, text="Personal medico disponible:").grid(row=2, column=0, padx=5, pady=5)
+
+    # Entrada para número de pacientes
+    entry3 = tk.Entry(satisfaction_frame)
+    entry3.grid(row=2, column=1, padx=5, pady=5)
+
+    # Botón para realizar la predicción
+    predict_button = tk.Button(satisfaction_frame, text="Predecir satisfacción general", command=lambda: predict_patient_satisfaction(df,entry1.get(), entry2.get(), entry3.get()))
+    predict_button.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
+
+    # Etiqueta para mostrar el resultado de la predicción
+    global satisfaction_prediction_result_label
+    satisfaction_prediction_result_label = tk.Label(satisfaction_frame, text="")
+    satisfaction_prediction_result_label.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
+
 def predict_waiting_time(patients: str, df: pd.DataFrame) -> None:
     try:
         num_patients = int(patients)
@@ -122,3 +157,37 @@ def predict_waiting_time(patients: str, df: pd.DataFrame) -> None:
     
     except ValueError:
         messagebox.showerror("Error", "Por favor, ingrese un número válido.")
+
+def predict_patient_satisfaction(df: pd.DataFrame, waiting_time: str, consultation_duration: str, medical_staff: str) -> None:
+    try:
+        # Convertir entradas a enteros
+        waiting_time_int = int(waiting_time)
+        consultation_duration_int = int(consultation_duration)
+        medical_staff_int = int(medical_staff)
+
+        # Preparar datos para el modelo
+        x = df[['Tiempo de espera (min)', 'Duración de la consulta', 'Personal médico disponible']].values
+        y = df['Satisfacción general'].values
+
+        # Dividir los datos en conjunto de entrenamiento y prueba
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=40)
+
+        # Entrenar el modelo de regresión lineal
+        model = LinearRegression()
+        model.fit(x_train, y_train)
+
+        # Evaluar el modelo con el conjunto de prueba (opcional)
+        y_pred = model.predict(x_test)
+        mse = mean_squared_error(y_test, y_pred)
+        print(f"Error Cuadrático Medio en el conjunto de prueba: {mse:.2f}")
+
+        # Predecir la satisfacción general basada en las nuevas entradas
+        predicted_satisfaction = model.predict([[waiting_time_int, consultation_duration_int, medical_staff_int]])
+        
+        # Mostrar el resultado
+        satisfaction_prediction_result_label.config(text=f"Satisfacción General Predicha: {predicted_satisfaction[0]:.2f}")
+    
+    except ValueError:
+        messagebox.showerror("Error", "Por favor, ingrese valores numéricos válidos.")
+    except Exception as e:
+        messagebox.showerror("Error en la predicción", str(e))
