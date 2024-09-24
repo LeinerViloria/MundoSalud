@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import TKinter_Manager as Tk_Manager
 import path_manager as pm
+from sklearn.metrics import mean_squared_error
 
 day_column = 'Dia'
 patients_treated_label = 'Pacientes atendidos'
@@ -98,20 +99,26 @@ def predict_waiting_time(patients: str, df: pd.DataFrame) -> None:
         num_patients = int(patients)
         
         # Preparar datos para el modelo
-        x = df[[patients_treated_label]].values
-        y = df[waiting_time_label].values
-
-        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2,  random_state=40)
+        x = df[[patients_treated_label]].values  # Columnas con el número de pacientes atendidos
+        y = df[waiting_time_label].values        # Columnas con el tiempo de espera
+        
+        # Dividir los datos en conjunto de entrenamiento y prueba
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=40)
         
         # Entrenar el modelo de regresión lineal
         model = LinearRegression()
-        model.fit(x_train, y_train)
+        model.fit(x_train, y_train)  # Entrena el modelo solo con los datos de entrenamiento
         
-        # Predecir el tiempo de espera
-        predicted_waiting_time = model.predict(x_test)
+        # Evaluar el modelo con el conjunto de prueba (opcional)
+        y_pred = model.predict(x_test)
+        mse = mean_squared_error(y_test, y_pred)
+        print(f"Error Cuadrático Medio en el conjunto de prueba: {mse:.2f}")
+        
+        # Predecir el tiempo de espera basado en el número de pacientes ingresados
+        predicted_waiting_time = model.predict([[num_patients]])  # Se usa una lista anidada
         
         # Mostrar el resultado
-        prediction_result_label.config(text=f"Tiempo de Espera Predicho: {predicted_waiting_time:.2f} minutos")
+        prediction_result_label.config(text=f"Tiempo de Espera Predicho: {predicted_waiting_time[0]:.2f} minutos")
     
     except ValueError:
         messagebox.showerror("Error", "Por favor, ingrese un número válido.")
