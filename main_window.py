@@ -103,7 +103,7 @@ def add_prediction_section(window: tk.Misc, df: pd.DataFrame) -> None:
     # Etiqueta para mostrar el resultado de la predicción
     global prediction_result_label
     prediction_result_label = tk.Label(frame, text="")
-    prediction_result_label.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+    prediction_result_label.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
 
     ###
 
@@ -140,31 +140,35 @@ def add_prediction_section(window: tk.Misc, df: pd.DataFrame) -> None:
     satisfaction_prediction_result_label = tk.Label(satisfaction_frame, text="")
     satisfaction_prediction_result_label.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
+def get_predict_waiting_time(patients: str, df: pd.DataFrame) -> float:
+    num_patients = int(patients)
+        
+    # Preparar datos para el modelo
+    x = df[[patients_treated_label]].values  
+    y = df[waiting_time_label].values        
+    
+    # Dividir los datos en conjunto de entrenamiento y prueba
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=40)
+    
+    # Entrenar el modelo de regresión lineal
+    model = LinearRegression()
+    model.fit(x_train, y_train)  # Entrena el modelo solo con los datos de entrenamiento
+    
+    # Evaluar el modelo con el conjunto de prueba (opcional)
+    y_pred = model.predict(x_test)
+    mse = mean_squared_error(y_test, y_pred)
+    print(f"Error Cuadrático Medio en el conjunto de prueba: {mse:.2f}")
+    
+    # Predecir el tiempo de espera basado en el número de pacientes ingresados
+    predicted_waiting_time = model.predict([[num_patients]])  # Se usa una lista anidada
+    return predicted_waiting_time[0]
+
 def predict_waiting_time(patients: str, df: pd.DataFrame) -> None:
     try:
-        num_patients = int(patients)
-        
-        # Preparar datos para el modelo
-        x = df[[patients_treated_label]].values  # Columnas con el número de pacientes atendidos
-        y = df[waiting_time_label].values        # Columnas con el tiempo de espera
-        
-        # Dividir los datos en conjunto de entrenamiento y prueba
-        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=40)
-        
-        # Entrenar el modelo de regresión lineal
-        model = LinearRegression()
-        model.fit(x_train, y_train)  # Entrena el modelo solo con los datos de entrenamiento
-        
-        # Evaluar el modelo con el conjunto de prueba (opcional)
-        y_pred = model.predict(x_test)
-        mse = mean_squared_error(y_test, y_pred)
-        print(f"Error Cuadrático Medio en el conjunto de prueba: {mse:.2f}")
-        
-        # Predecir el tiempo de espera basado en el número de pacientes ingresados
-        predicted_waiting_time = model.predict([[num_patients]])  # Se usa una lista anidada
+        predicted_waiting_time = get_predict_waiting_time(patients, df)
         
         # Mostrar el resultado
-        prediction_result_label.config(text=f"Tiempo de Espera Predicho: {predicted_waiting_time[0]:.2f} minutos")
+        prediction_result_label.config(text=f"Tiempo de Espera Predicho: {predicted_waiting_time:.2f} minutos")
     
     except ValueError:
         messagebox.showerror("Error", "Por favor, ingrese un número válido.")
@@ -204,4 +208,33 @@ def predict_patient_satisfaction(df: pd.DataFrame, waiting_time: str, consultati
         messagebox.showerror("Error en la predicción", str(e))
 
 def predict_probability_of_recommendation(patients: str, df: pd.DataFrame):
-    aux = 1
+    try:
+        predicted_waiting_time = get_predict_waiting_time(patients, df)
+
+        x = df[['Tiempo de espera (min)']].values
+        y = df['Satisfacción general (1-10)'].values
+
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=40)
+
+        model = LinearRegression()
+        model.fit(x_train, y_train)
+
+        predicted_satisfaction = model.predict([[predicted_waiting_time]])
+        predicted_satisfaction = float(predicted_satisfaction[0])
+
+        x1 = df[['Tiempo de espera (min)', 'Satisfacción general (1-10)']].values
+        y1 = df['Probabilidad de recomendación (%)'].values
+
+        x1_train, x1_test, y1_train, y1_test = train_test_split(x1, y1, test_size=0.2, random_state=40)
+
+        model1 = LinearRegression()
+        model1.fit(x1_train, y1_train)
+
+        predicted_probability = model1.predict([[predicted_waiting_time, predicted_satisfaction]])
+
+        prediction_result_label.config(text=f"Probabilidad de recomendación: {predicted_probability:.2f} %")
+
+    except ValueError:
+        messagebox.showerror("Error", "Por favor, ingrese un número válido.")
+    except Exception as e:
+        messagebox.showerror("Error en la predicción", str(e))
