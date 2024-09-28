@@ -97,6 +97,9 @@ def add_prediction_section(window: tk.Misc, df: pd.DataFrame) -> None:
     predict_button = tk.Button(frame, text="Predecir Tiempo de Espera", command=lambda: predict_waiting_time(entry.get(), df))
     predict_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 
+    predict_button2 = tk.Button(frame, text="Predecir probabilidad de recomendación", command=lambda: predict_probability_of_recommendation(entry.get(), df))
+    predict_button2.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+
     # Etiqueta para mostrar el resultado de la predicción
     global prediction_result_label
     prediction_result_label = tk.Label(frame, text="")
@@ -199,3 +202,6 @@ def predict_patient_satisfaction(df: pd.DataFrame, waiting_time: str, consultati
         messagebox.showerror("Error", "Por favor, ingrese valores numéricos válidos.")
     except Exception as e:
         messagebox.showerror("Error en la predicción", str(e))
+
+def predict_probability_of_recommendation(patients: str, df: pd.DataFrame):
+    aux = 1
