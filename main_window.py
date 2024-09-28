@@ -11,6 +11,7 @@ from sklearn.metrics import mean_squared_error
 day_column = 'Dia'
 patients_treated_label = 'Pacientes atendidos'
 waiting_time_label = 'Tiempo de espera (min)'
+global_tree = None
 
 def runMainWindow():
     # VENTANA PRINCIPAL
@@ -49,6 +50,11 @@ def on_listbox_select(event, window):
         display_excel_data(window, file_path)
 
 def display_excel_data(window: tk.Misc, file_path: str) -> None:
+    global global_tree
+
+    if global_tree is not None:
+        global_tree.destroy()
+
     frame = tk.Frame(window)
     frame.grid(row=8, column=2, padx=2)
     
@@ -70,6 +76,8 @@ def display_excel_data(window: tk.Misc, file_path: str) -> None:
     # Insertar filas
     for _, row in df.iterrows():
         tree.insert("", "end", values=list(row))
+
+    global_tree = tree
 
     # Añadir área para la predicción
     add_prediction_section(window, df)
