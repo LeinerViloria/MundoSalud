@@ -232,7 +232,7 @@ def predict_probability_of_recommendation(patients: str, df: pd.DataFrame):
 
         predicted_probability = model1.predict([[predicted_waiting_time, predicted_satisfaction]])
 
-        prediction_result_label.config(text=f"Probabilidad de recomendación: {predicted_probability:.2f} %")
+        prediction_result_label.config(text=f"Probabilidad de recomendación: {predicted_probability[0]:.2f} %")
 
     except ValueError:
         messagebox.showerror("Error", "Por favor, ingrese un número válido.")
