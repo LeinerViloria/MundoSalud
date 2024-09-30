@@ -1,3 +1,5 @@
+import os
+import sys
 import tkinter as tk
 from tkinter import messagebox
 from tkinter.ttk import Treeview
@@ -5,13 +7,20 @@ from sklearn.linear_model import LinearRegression
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import TKinter_Manager as Tk_Manager
-import path_manager as pm
 from sklearn.metrics import mean_squared_error
 
 day_column = 'Dia'
 patients_treated_label = 'Pacientes atendidos'
 waiting_time_label = 'Tiempo de espera (min)'
 global_tree = None
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def runMainWindow():
     # VENTANA PRINCIPAL
@@ -20,14 +29,18 @@ def runMainWindow():
     ventana_principal.configure(background="light blue")
     ventana_principal.attributes("-alpha", 1)
     ventana_principal.title("MUNDO-SALUD")
-    ventana_principal.iconbitmap('img/medical.ico')
+    ventana_principal.iconbitmap(resource_path('img/medical.ico'))
     ventana_principal.minsize(930, 600)
 
     # TITULO PRINCIPAL
     etiqueta_principal = tk.Label(ventana_principal, text="Elige un dataframe para usarlo como fuente para las predicciones")
     etiqueta_principal.grid(row=4, column=1, padx=5, pady=5, sticky="ew")
 
-    xlsx_files = pm.getFiles()
+    xlsx_files = [
+        resource_path('source/Datos - Requerimiento 1.xlsx'),
+        resource_path('source/Datos - Requerimiento 2.xlsx'),
+        resource_path('source/Datos - Requerimiento 3.xlsx')
+    ]
 
     # FRAME QUE MUESTRA LOS EXCEL
     frame = tk.Frame(ventana_principal)
@@ -35,7 +48,7 @@ def runMainWindow():
     main_listbox = tk.Listbox(frame, height=10, width=50)
     main_listbox.grid(row=0, column=1)
     for file in xlsx_files:
-        main_listbox.insert(tk.END, file)
+        main_listbox.insert(tk.END, file.split('/')[-1])
 
     main_listbox.bind("<<ListboxSelect>>", lambda event: on_listbox_select(event, ventana_principal))
 
@@ -46,7 +59,7 @@ def on_listbox_select(event, window):
     if selection:
         index = selection[0]
         file = event.widget.get(index)
-        file_path = f"{pm.current_directory}/source/{file}"
+        file_path = f'source\\{file}'
         display_excel_data(window, file_path)
 
 def display_excel_data(window: tk.Misc, file_path: str) -> None:
